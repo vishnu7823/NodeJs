@@ -48,6 +48,43 @@ app.post('/api/students',(req,res)=>{
     
 })
 
-app.listen(4000,()=>{
-       console.log("listening to port 4000")
+app.put('/api/students/:id',(req,res)=>{
+
+    let id = HTMLTableRowElement.params.id;
+    let obj1 = studentArray.find((item)=>{
+        return item.id === id
+    })
+
+    if(obj1 === undefined){
+        res.sendStatus(404);
+    }
+    let data = req.body;
+    let newobj1 = {...obj1,...data}
+    let index = studentArray.indexOf(obj1)
+    studentArray[index]  = newobj1;
+    res.send(studentArray)
+
+})
+
+
+app.delete('/api/students',(req,res)=>{
+
+    let id = HTMLTableRowElement.params.id;
+    let obj1 = studentArray.find((item)=>{
+        return item.id === id
+    })
+
+    if(obj1 === undefined){
+        res.sendStatus(404);
+    }
+    
+  
+    let index = studentArray.indexOf(obj1)
+    studentArray.splice(index,1)
+    res.send(studentArray)
+
+})
+
+app.listen(8000,()=>{
+       console.log("listening to port 8000")
 })
