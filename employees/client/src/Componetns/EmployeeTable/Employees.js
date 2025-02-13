@@ -1,126 +1,133 @@
-import React, { useEffect, useState } from 'react';
-import "./Employees.css"
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import './Employees.css'
 
-const EmployeesTable = () => {
-    const [employees, setEmployees] = useState([]);
-    const [formData, setFormData] = useState({ name: "", email: "", age: "", salary: "" });
-    const [editingEmployeeId, setEditingEmployeeId] = useState(null);
+function Employeelist(){
 
-    // Fetch Employees
-    useEffect(() => {
-        fetchEmployees();
-    }, []);
+    const[employees,setEmployees]  = useState([])
+    const[formdata,setFormdata] = useState({
+        'name':'',
+        'email':'',
+        'age':'',
+        'salary':''
+    })
+    const[updateemployee, setUpdateEmployee]= useState(null)
 
-    const fetchEmployees = async () => {
-        try {
-            const response = await fetch('http://localhost:5000/api/employees', {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                mode: 'cors'
-            });
-            const data = await response.json();
-            setEmployees(data);
-        } catch (error) {
-            console.error('Error fetching employees:', error);
-        }
-    };
+    const handleupdate = (employee)=>{
+        setUpdateEmployee(employee);
+        setFormdata({
+            name:employee.name,
+            email:employee.email,
+            age:employee.age,
+            salary:employee.salary
+        })
+        
+    }
 
-    // Handle Input Change
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    const handledelete = (id)=>{
+        axios.delete(`http://localhost:5000/api/employees/${id}`)
+        .then(()=>{
+               setEmployees(employees.filter(emp => emp._id!== id))
+        })
+        .catch(err=>console.log(err))
 
-    // Handle Add / Update Employee
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const method = editingEmployeeId ? 'PUT' : 'POST';
-            const url = editingEmployeeId
-                ? `http://localhost:5000/api/employees/${editingEmployeeId}`
-                : 'http://localhost:5000/api/employees';
+    }
+  const handlechange=(e)=>{
+       const {name,value} = e.target;
+       setFormdata(prevstate=>({
+        ...prevstate,
+        [name]:value || ''
+       }))
+  }
 
-            await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
+  const handlesubmit = (e)=>{
+    e.preventDefault();
+    if(updateemployee){
+        axios.put(`http://localhost:5000/api/employees/${updateemployee._id}`,formdata)
+        .then(res=>{
+            setEmployees(employees.map(emp=> emp._id === res.data._id ? res.data : emp))
+            setUpdateEmployee(null)
+            setFormdata({
+                name:'',
+                email:'',
+                age:'',
+                saalry: ''
+            })
+        })
+        .catch(err=>console.log(err))
+    }
+    else{
+    axios.post('http://localhost:5000/api/employees',formdata)
+    .then(res=>{
+        setEmployees([...employees,res.data]);
+        setFormdata({
+            'name':'',
+            'email':'',
+            'age':'',
+            'salary':''
 
-            fetchEmployees();
-            setFormData({ name: "", email: "", age: "", salary: "" });
-            setEditingEmployeeId(null);
-        } catch (error) {
-            console.error('Error saving employee:', error);
-        }
-    };
+        })
+    })
+    .catch(err => console.log(err))
+    }
+  }
 
-    // Handle Edit Click
-    const handleEdit = (employee) => {
-        setFormData({
-            name: employee.name,
-            email: employee.email,
-            age: employee.age,
-            salary: employee.salary,
-        });
-        setEditingEmployeeId(employee._id);
-    };
+    useEffect(()=>{
+        axios.get('http://localhost:5000/api/employees')
+        .then(res=>setEmployees(res.data))
+        .catch(err=>console.log(err))
+    },[])
+return(
+    <div>
+        <h1>List of Employees</h1>
 
-    // Handle Delete Employee
-    const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to delete this employee?")) {
-            try {
-                await fetch(`http://localhost:5000/api/employees/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                });
+        <table>
+            <thead>
+                <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Age</th> 
+                <th>Salary</th>
+                </tr>
+            </thead>
 
-                fetchEmployees();
-            } catch (error) {
-                console.error('Error deleting employee:', error);
-            }
-        }
-    };
-
-    return (
-        <div>
-            <h2>Employee List</h2>
-
-            {/* Employee Form */}
-            <form onSubmit={handleSubmit}>
-                <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
-                <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-                <input type="number" name="age" placeholder="Age" value={formData.age} onChange={handleChange} required />
-                <input type="number" name="salary" placeholder="Salary" value={formData.salary} onChange={handleChange} required />
-                <button type="submit">{editingEmployeeId ? "Update" : "Add"}</button>
-            </form>
-
-            {/* Employee Table */}
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Age</th>
-                        <th>Salary</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {employees.map(emp => (
-                        <tr key={emp._id}>
-                            <td>{emp.name}</td>
-                            <td>{emp.email}</td>
-                            <td>{emp.age}</td>
-                            <td>{emp.salary}</td>
+            <tbody>
+                {
+                    employees.map((employee,index)=>{
+                         return <tr key={index}> 
+                            <td>{employee.name}</td>
+                            <td>{employee.email}</td>
+                            <td>{employee.age}</td>
+                            <td>{employee.salary}</td>
                             <td>
-                                <button onClick={() => handleEdit(emp)}>Edit</button>
-                                <button onClick={() => handleDelete(emp._id)}>Delete</button>
+                                <button type='submit'onClick={()=>handleupdate(employee)}>Update</button>
+                                <button type ='submit'onClick={()=> handledelete(employee._id)}>Delete</button>  
                             </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
-};
+                         </tr>
+                    })
+                }
 
-export default EmployeesTable;
+            </tbody>
+        </table>
+        <form onSubmit={handlesubmit}>
+    <label>Name</label>
+    <input name='name'value={formdata.name} onChange={handlechange} placeholder='enter name' />
+
+    <label>Email</label>
+   <input name ='email'value={formdata.email} onChange={handlechange}placeholder='enter email' />
+
+    <label>Age</label>
+    <input name='age' value={formdata.age} onChange={handlechange}placeholder='enter Age' />
+
+    <label>Salary</label>
+    <input name='salary'value ={formdata.salary} onChange={handlechange}placeholder='enter Salary' />
+
+    <button type='submit'>ADD</button>
+    
+
+</form>
+    </div>
+)
+}
+
+export default Employeelist;
