@@ -12,6 +12,7 @@ function Employeelist(){
         'salary':''
     })
     const[updateemployee, setUpdateEmployee]= useState(null)
+    const [search,setSearch] = useState("");
 
     const handleupdate = (employee)=>{
         setUpdateEmployee(employee);
@@ -73,13 +74,19 @@ function Employeelist(){
   }
 
     useEffect(()=>{
-        axios.get('http://localhost:5000/api/employees')
+        
+        axios.get(`http://localhost:5000/api/employees?search=${search}`)
         .then(res=>setEmployees(res.data))
         .catch(err=>console.log(err))
-    },[])
+    },[search])
+
+
 return(
     <div>
         <h1>List of Employees</h1>
+        <div>
+            <input type='text' placeholder='search employee' value={search} onChange={(e)=>setSearch(e.target.value)}/>
+        </div>
 
         <table>
             <thead>
@@ -88,6 +95,7 @@ return(
                 <th>Email</th>
                 <th>Age</th> 
                 <th>Salary</th>
+                <th>Edit</th>
                 </tr>
             </thead>
 

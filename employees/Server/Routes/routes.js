@@ -5,18 +5,23 @@ const router = express.Router(); // routingservices
 const Employee  = require('../Database/DbModel')
 
 
-//get logic
-router.get('/employees',async (req,res)=>{
+//
+router.get('/employees', async (req, res) => {
+    const { search } = req.query; 
 
-    try{
-        const employees = await Employee.find();
-        res.status(200).json(employees)
-    }catch(error){
-        res.status(400).json({message:"employee reading failed"})
+    try {
+        let query = {};
+        if (search) {
+            query.name = { $regex: search, $options: "i" };
+        }
 
+        const employees = await Employee.find(query);
+        res.status(200).json(employees);
+    } catch (error) {
+        console.error("Error searching employees:", error);
+        res.status(400).json({ message: "Error fetching employees", error });
     }
-
-})
+});
 
 
 
