@@ -1,0 +1,36 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+debug.log
+
+# Build & Cache
+dist/
+coverage/
+.cache/
+pm2-log.log
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database files
+*.sqlite
+*.db
+*.db-wal
+*.db-shm
+
+# Editor & System files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
