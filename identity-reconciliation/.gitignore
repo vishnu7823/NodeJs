@@ -1,36 +1,41 @@
-# Node modules
+# Node.js dependencies
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Logs
-logs/
-*.log
-debug.log
-
-# Build & Cache
-dist/
-coverage/
-.cache/
-pm2-log.log
-
 # Environment variables
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log
+yarn-debug.log
+debug.log
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
 
 # Database files
 *.sqlite
-*.db
-*.db-wal
-*.db-shm
+*.sqlite3
+/data/db/
+dump.rdb
+*.lock
 
-# Editor & System files
-.DS_Store
+# VS Code settings
 .vscode/
-.idea/
-*.swp
-*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+out/
+coverage/
